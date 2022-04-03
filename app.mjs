@@ -5,7 +5,7 @@ const root = '/Volumes/BACKUPA/Backup/Shared/Pictures';
 const changeExif = async (fullPath) => {
     const exif = electron.getExifFromJpegFile(fullPath);
     const existingHash = exif.Exif[electron.piexif.ExifIFD.ImageUniqueID];
-    if(existingHash && existingHash.startsWith('bkpv0-')) {
+    if (existingHash && existingHash.startsWith('bkpv0-')) {
         console.log(`Skipping ${fullPath}`);
         return;
     }
@@ -34,6 +34,7 @@ const scan = async (directoryName, hashes, cb) => {
 
                 const file = {
                     name: f.name,
+                    path: fullPath,
                 }
                 try {
                     const exif = electron.getExifFromJpegFile(fullPath);
@@ -46,7 +47,7 @@ const scan = async (directoryName, hashes, cb) => {
                     console.error(`Error unpacking ${f.name}`, e)
                 }
             }
-        } catch(ex) {
+        } catch (ex) {
             console.error(`Error on file ${f}`, ex);
         }
     }
@@ -59,7 +60,13 @@ onload = () => {
           <div>
           {{ path }}
           <ol>
-            <li v-for="hash in Object.keys(hashes).filter(hash => hashes[hash].length > 1)">{{ hash }} count={{ hashes[hash].length }}</li>
+            <li v-for="hash in Object.keys(hashes).filter(hash => hashes[hash].length > 1)">
+              {{ hash }}
+            <span v-for="file in hashes[hash]">
+              {{ file.path }}
+              <img :src="'file://' + file.path"/>
+            </span>
+            </li>
           </ol>
           </div>`,
         data() {
