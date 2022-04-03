@@ -1,5 +1,7 @@
 import Vue from './node_modules/vue/dist/vue.esm.browser.js';
 
+const root = '/Volumes/My Passport/Backup/Shared/Pictures';
+
 onload = () => {
   const app = new Vue({
     el: '#app',
@@ -11,10 +13,8 @@ onload = () => {
     data: {
       files: [],
     },
-    created() {
-      this.files = window.electron.fs.readdirSync(
-        '/Volumes/My Passport/Backup/Shared/Pictures'
-      );
+    async created() {
+      this.files = await window.electron.fs.readdir(root);
       console.log(this.files);
     },
   });
