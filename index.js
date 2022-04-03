@@ -15,6 +15,9 @@ const createWindow = () => {
   globalShortcut.register('CommandOrControl+Y', () => {
     win.webContents.openDevTools();
   });
+  globalShortcut.register('CommandOrControl+R', () => {
+    win.webContents.location.reload();
+  });
 };
 
 app.whenReady().then(() => {
