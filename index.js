@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, globalShortcut } = require('electron');
 const path = require('path');
 
 const createWindow = () => {
@@ -11,6 +11,10 @@ const createWindow = () => {
   });
 
   win.loadFile('index.html');
+
+  globalShortcut.register('CommandOrControl+X', () => {
+    win.webContents.openDevTools();
+  });
 };
 
 app.whenReady().then(() => {
