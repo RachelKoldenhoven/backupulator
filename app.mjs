@@ -2,6 +2,25 @@ import Vue from './node_modules/vue/dist/vue.esm.browser.js';
 
 const root = '/Volumes/BACKUPA/Backup/Shared/Pictures';
 
+const changeExif = async (fullPath) => {
+    const exif = electron.getExifFromJpegFile(fullPath);
+    const existingHash = exif.Exif[electron.piexif.ExifIFD.ImageUniqueID];
+    if(existingHash && existingHash.startsWith('bkpv0-')) {
+        console.log(`Skipping ${fullPath}`);
+        return;
+    }
+
+    console.log(`Hashing ${fullPath}`);
+    const hash = await electron.imageHash.hash(fullPath, 8, 'hex');
+    exif.Exif[electron.piexif.ExifIFD.ImageUniqueID] = `bkpv0-${hash.hash}`;
+
+    const newImageData = electron.getBase64DataFromJpegFile(fullPath);
+    const newExifBinary = electron.piexif.dump(exif);
+    const newPhotoData = electron.piexif.insert(newExifBinary, newImageData);
+    const fileBuffer = Buffer.from(newPhotoData, 'binary');
+    await electron.fsp.writeFile(fullPath, fileBuffer);
+};
+
 const scan = async (directoryName, hashes, cb) => {
     let dir = await electron.fsp.readdir(directoryName, {withFileTypes: true});
     for (const f of dir) {
@@ -11,7 +30,7 @@ const scan = async (directoryName, hashes, cb) => {
             if (f.isDirectory()) {
                 await scan(fullPath, hashes, cb);
             } else if (['.jpg', '.jpeg'].includes(ext)) {
-                // await changeExif(fullPath);
+                await changeExif(fullPath);
 
                 const file = {
                     name: f.name,

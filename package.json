@@ -13,7 +13,8 @@
     "electron": "^18.0.1"
   },
   "dependencies": {
-    "image-hash": "^5.0.2",
+    "imghash": "0.0.9",
+    "node-image-hash": "^1.1.0",
     "piexifjs": "^1.0.6",
     "vue": "^2.6.14"
   }
