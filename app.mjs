@@ -41,7 +41,7 @@ const scan = async (directoryName, hashes, cb) => {
                     file.imageUniqueId = imageUniqueId;
                     hashes[imageUniqueId] = hashes[imageUniqueId] || [];
                     hashes[imageUniqueId].push(file);
-                    console.log(imageUniqueId)
+                    cb(hashes, fullPath);
                 } catch (e) {
                     console.error(`Error unpacking ${f.name}`, e)
                 }
@@ -50,7 +50,6 @@ const scan = async (directoryName, hashes, cb) => {
             console.error(`Error on file ${f}`, ex);
         }
     }
-    cb(hashes);
 }
 
 onload = () => {
@@ -58,18 +57,26 @@ onload = () => {
         el: '#app',
         template: `
           <div>
+          {{ path }}
           <ol>
-            <li v-for="hash in Object.keys(hashes)">{{ hash }} count={{ hashes[hash].length }}</li>
+            <li v-for="hash in Object.keys(hashes).filter(hash => hashes[hash].length > 1)">{{ hash }} count={{ hashes[hash].length }}</li>
           </ol>
           </div>`,
-        data: {
-            hashes: {
-                'test': []
-            },
+        data() {
+            return {
+                path: "",
+                hashes: {
+                    'test': []
+                },
+            }
         },
         async created() {
             this.hashes = {}
-            scan(root, this.hashes, (hashes) => this.hashes = hashes);
+            scan(root, this.hashes, (hashes, path) => {
+                this.hashes = hashes;
+                this.path = path;
+                this.$forceUpdate();
+            });
         },
     });
 };
