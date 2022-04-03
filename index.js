@@ -12,7 +12,7 @@ const createWindow = () => {
 
   win.loadFile('index.html');
 
-  globalShortcut.register('CommandOrControl+X', () => {
+  globalShortcut.register('CommandOrControl+Y', () => {
     win.webContents.openDevTools();
   });
 };
