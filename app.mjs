@@ -17,8 +17,8 @@ onload = () => {
             },
         },
         async created() {
-            const hashes = {}
-            this.hashes = await electron.scan(root, hashes);
+            this.hashes = {}
+            electron.scan(root, this.hashes, (hashes) => this.hashes = hashes);
         },
     });
 };

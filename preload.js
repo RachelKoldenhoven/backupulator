@@ -7,14 +7,14 @@ const fsp = fs.promises;
 
 const getBase64DataFromJpegFile = filename => fs.readFileSync(filename).toString('binary');
 const getExifFromJpegFile = filename => piexif.load(getBase64DataFromJpegFile(filename));
-const scan = async (directoryName, hashes) => {
+const scan = async (directoryName, hashes, cb) => {
   let dir = await fsp.readdir(directoryName, {withFileTypes: true});
   for (const f of dir) {
     try {
       const fullPath = path.join(directoryName, f.name);
       const ext = path.extname(f.name).toLocaleLowerCase();
       if (f.isDirectory()) {
-        await scan(fullPath, hashes);
+        await scan(fullPath, hashes, cb);
       } else if (['.jpg', '.jpeg'].includes(ext)) {
         const file = {
           name: f.name,
@@ -34,7 +34,7 @@ const scan = async (directoryName, hashes) => {
       console.error(`Error on file ${f}`, ex);
     }
   }
-  return hashes;
+  cb(hashes);
 }
 
 contextBridge.exposeInMainWorld('electron', {
